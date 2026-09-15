@@ -1,0 +1,24 @@
+## .NET
+bin/
+obj/
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+TestResults/
+*.user
+*.suo
+*.userprefs
+
+## Local configuration and generated reports
+.env
+appsettings.*.local.json
+*.pfx
+*.key
+*.pem
+*.pdf
+coverage/
+
+## IDEs
+.vs/
+.idea/
+.vscode/

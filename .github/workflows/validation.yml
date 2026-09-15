@@ -1,0 +1,49 @@
+name: Operations Portal validation
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: auction_app
+          POSTGRES_PASSWORD: change_me_in_local_env
+          POSTGRES_DB: auction_operations
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U auction_app -d auction_operations"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+      rabbitmq:
+        image: rabbitmq:4-management
+        env:
+          RABBITMQ_DEFAULT_USER: auction
+          RABBITMQ_DEFAULT_PASS: change_me_in_local_env
+        ports:
+          - 5672:5672
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      ConnectionStrings__AuctionOperationsDb: Host=127.0.0.1;Port=55432;Database=auction_operations;Username=auction_app;Password=change_me_in_local_env
+      AUCTION_OPERATIONS_RABBITMQ_HOST: 127.0.0.1
+      AUCTION_OPERATIONS_RABBITMQ_PORT: 5672
+      AUCTION_OPERATIONS_RABBITMQ_USERNAME: auction
+      AUCTION_OPERATIONS_RABBITMQ_PASSWORD: change_me_in_local_env
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x
+      - run: dotnet restore
+      - run: dotnet build --no-restore --warnaserror
+      - run: dotnet test --no-build --no-restore

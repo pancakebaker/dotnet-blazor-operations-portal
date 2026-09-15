@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/contracts/" />
+  <Folder Name="/contracts/auth-contracts/">
+    <Project Path="contracts/auth-contracts/DistributedBidding.AuthContracts.csproj" />
+  </Folder>
+  <Folder Name="/contracts/integration-contracts/">
+    <Project Path="contracts/integration-contracts/DistributedBidding.IntegrationContracts.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/AuctionOperationsPortal/AuctionOperationsPortal.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AuctionOperationsPortal.Tests/AuctionOperationsPortal.Tests.csproj" />
+  </Folder>
+</Solution>

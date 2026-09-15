@@ -1,0 +1,161 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  color: #1f2937;
+  background: #f8fafc;
+}
+header {
+  padding: 1.25rem 2rem;
+  background: #0f172a;
+  color: white;
+}
+.content {
+  max-width: 70rem;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  color: #1f2937;
+}
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+header {
+  border-bottom: 1px solid #d1d5db;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+}
+header h1 {
+  margin: 0 0 0.75rem;
+}
+nav a {
+  color: #ffffff;
+  margin-right: 1rem;
+}
+nav a:visited {
+  color: #ffffff;
+}
+nav a:hover,
+nav a:focus-visible {
+  color: #d1d5db;
+}
+.content {
+  min-height: 20rem;
+}
+.tenant-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+.tenant-table td:last-child {
+  white-space: nowrap;
+}
+.tenant-table button {
+  font: inherit;
+  margin: 0.15rem;
+  padding: 0.4rem 0.65rem;
+}
+.status-badge {
+  border-radius: 999px;
+  display: inline-block;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+}
+.status-active { background: #dcfce7; color: #166534; }
+.status-suspended { background: #fef3c7; color: #92400e; }
+.status-disabled { background: #fee2e2; color: #991b1b; }
+.success-message {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  margin: 1rem 0;
+  padding: 0.6rem 1rem;
+}
+.modal-backdrop {
+  align-items: center;
+  background: rgb(15 23 42 / 55%);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  z-index: 10;
+}
+.confirmation-dialog {
+  background: white;
+  border-radius: 0.4rem;
+  max-width: 32rem;
+  padding: 1.5rem;
+  width: calc(100% - 2rem);
+}
+.muted {
+  color: #6b7280;
+}
+.activity-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.tenant-history {
+  margin: 0.5rem 0;
+  overflow-x: auto;
+}
+.tenant-history code {
+  font-size: 0.8rem;
+}
+.activity-table th,
+.activity-table td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.6rem;
+  text-align: left;
+}
+.history-filters {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  margin-bottom: 1.5rem;
+}
+.history-filters label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+.history-filters input,
+.history-filters select {
+  font: inherit;
+  padding: 0.45rem;
+}
+.history-actions {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.history-actions button,
+.pagination button {
+  font: inherit;
+  padding: 0.45rem 0.8rem;
+}
+.history-actions button {
+  white-space: nowrap;
+}
+.validation-message,
+.error-message {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  margin: 1rem 0;
+  padding: 0.6rem 1rem;
+}
+.validation-message p {
+  margin: 0.2rem 0;
+}
+.pagination {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}

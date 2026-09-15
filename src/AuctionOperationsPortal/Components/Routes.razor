@@ -1,0 +1,18 @@
+@using AuctionOperationsPortal.Components.Layout
+@rendermode InteractiveServer
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(Program).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    <LayoutView Layout="@typeof(MainLayout)">
+                        <h2>Authentication required</h2>
+                        <p>Sign in as a system administrator to continue.</p>
+                        <a href="/login">Open Operations Portal sign-in</a>
+                    </LayoutView>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+        </Found>
+        <NotFound><p>Sorry, there is nothing at this address.</p></NotFound>
+    </Router>
+</CascadingAuthenticationState>
