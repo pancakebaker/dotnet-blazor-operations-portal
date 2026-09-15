@@ -1,5 +1,7 @@
 # Distributed Bidding Auction Platform Operations Portal
 
+[![CI](https://github.com/pancakebaker/dotnet-blazor-operations-portal/actions/workflows/validation.yml/badge.svg)](https://github.com/pancakebaker/dotnet-blazor-operations-portal/actions/workflows/validation.yml)
+
 Standalone ASP.NET Core Blazor Operations Portal for the Distributed Bidding Auction Platform.
 
 ## Responsibility
@@ -74,10 +76,22 @@ mapping, including:
 Do not commit secrets or private keys. Platform-level Docker orchestration and deployment remain
 external concerns.
 
+## Related repositories
+
+- [Bidding Service](https://github.com/pancakebaker/dotnet-bidding-service) owns authoritative auction, bid, tenant, winner, and final-price decisions.
+- [Live Feed](https://github.com/pancakebaker/nodejs-live-feed) provides public real-time Socket.IO delivery.
+- [Laravel React Auction Web](https://github.com/pancakebaker/laravel-react-auction-web) is the tenant-facing BFF and client.
+- [DBAP Platform Infrastructure](https://github.com/pancakebaker/docker-dbap-platform) provides development PostgreSQL and RabbitMQ.
+- [Historical integrated monorepo](https://github.com/pancakebaker/distributed-bidding-auction-platform) preserves the original platform snapshot.
+
+The [platform architecture map](https://github.com/pancakebaker/docker-dbap-platform/blob/main/docs/architecture.md)
+summarizes the service boundaries. This is a functioning architecture and
+portfolio/demo portal; deployment hardening remains a separate concern. No
+license file is currently included in this extracted repository.
+
 ## Validation
 
 The standalone workflow restores, builds with analyzers and zero-warning policy, and runs the full
 Operations test project. It provisions PostgreSQL and RabbitMQ with health checks. The repository
 also retains the source project’s StyleCop, analyzer, EditorConfig, XML documentation, and
 100-column conventions.
-
