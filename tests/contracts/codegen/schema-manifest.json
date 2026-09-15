@@ -1,0 +1,13 @@
+{
+  "sourceRepository": "pancakebaker/dbap-integration-contracts",
+  "release": "v1.0.0",
+  "commit": "6c89fb85d96110b881ff789470e3d7acfd5331e1",
+  "files": {
+    "auction-cancelled.schema.json": "e1e2bfa24a8f5577decfde780a05892a35512feac8f68d60688e856cc05520bb",
+    "auction-closed.schema.json": "53a05e943a2fa0ad34d1c4172b4c2e619fa52e4b93ca142f8dd9c13a130da7a6",
+    "auction-purchased.schema.json": "2d27061cf794d8a4e36041625a65b89ca3e8d571b9d602101ae958666225576e",
+    "bid-accepted.schema.json": "63cc87bbfb13fa7d69c62d53b2b26bfc0cccb879e66786e1dda940def9a17dbf",
+    "event-envelope.schema.json": "bbaee47b48d111d82c5b6508971b0ed592b0db3929880bf4141f790d4cfa5d8a",
+    "winner-selected.schema.json": "3ea8282623c8daf9f792323296f7b9be41823ba7acb88ea83612f07814dc7603"
+  }
+}

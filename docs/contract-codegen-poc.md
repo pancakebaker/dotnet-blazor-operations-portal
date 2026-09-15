@@ -57,3 +57,32 @@ reproducible before production adoption. Phase 6 should consider replacing only
 the external consumer wire DTO declarations, retaining the current mapper and
 all Operations-local models and behavior. Do not generate a NuGet package until
 that migration proves a material maintenance reduction.
+
+## Phase 6 hardening
+
+The POC now uses the repository-local snapshot under
+`tests/contracts/schemas/v1/`, with provenance in `tests/contracts/CONTRACT_SOURCE.md`
+and SHA256 entries in `tests/contracts/codegen/schema-manifest.json`. The
+snapshot is the pinned `v1.0.0` release from the canonical contract repository;
+Operations does not own or fetch these schemas.
+
+Run `pwsh ./scripts/generate-contract-dtos.ps1` to regenerate the test-only
+output, or add `-Verify` to perform a byte-for-byte drift check without changing
+the worktree. The script resolves the repository root, checks the exact schema
+inventory and hashes, disables network schema retrieval in the test validator,
+and uses the stable local template/output pair. No sibling checkout or network
+access is required after dependencies are restored.
+
+The conformance boundary is explicit: fixture JSON is validated against the
+local draft-2020-12 schemas, deserialized with `System.Text.Json`, and then
+passed through the existing test adapter. Tests cover missing required fields,
+UUIDs, numeric types, timestamps, and diagnostic validation paths. Canonical
+schemas allow additional properties, so unknown fields remain accepted by the
+schema and ignored by the DTO. Unknown enum behavior remains a future adoption
+risk and is documented rather than hidden.
+
+CI runs both snapshot-integrity and byte-for-byte generated-output verification.
+The production build has no generator or validator dependency. Generator
+version changes require deliberate regeneration and review; schema upgrades
+require a new pinned release, provenance/hash update, regeneration, and
+conformance review.

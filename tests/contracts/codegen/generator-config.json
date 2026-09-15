@@ -1,0 +1,8 @@
+{
+  "generator": "NJsonSchema.CodeGeneration.CSharp",
+  "version": "11.3.2",
+  "serializer": "System.Text.Json",
+  "schemaDraft": "2020-12",
+  "resolution": "local-pinned-snapshot",
+  "output": "tests/AuctionOperationsPortal.Tests/ContractCodegen/Generated/IntegrationEventContracts.g.cs"
+}
