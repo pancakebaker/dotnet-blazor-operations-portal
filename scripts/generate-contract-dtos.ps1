@@ -15,15 +15,22 @@ $schemaRoot = Join-Path $root 'tests/contracts/schemas/v1'
 $output = Join-Path $root 'tests/AuctionOperationsPortal.Tests/ContractCodegen/Generated/IntegrationEventContracts.g.cs'
 $template = Join-Path $root 'tests/contracts/codegen/IntegrationEventContracts.template.g.cs'
 $schemas = Get-ChildItem -LiteralPath $schemaRoot -Filter '*.schema.json' -File | Sort-Object Name
+if (-not (Test-Path -LiteralPath $template -PathType Leaf)) { throw "Generator template is missing: $template" }
+$templateContent = Get-Content -Raw $template
 foreach ($schema in $schemas) {
     $document = Get-Content -Raw $schema.FullName | ConvertFrom-Json
     if ([string]::IsNullOrWhiteSpace($document.'$id')) { throw "Schema has no stable id: $($schema.Name)" }
+    if ($schema.Name -ne 'event-envelope.schema.json') {
+        foreach ($property in @($document.allOf[1].properties.payload.properties.psobject.Properties.Name)) {
+            if (-not $templateContent.Contains("JsonPropertyName(`"$property`")")) {
+                throw "Generated template is missing schema property $property from $($schema.Name)."
+            }
+        }
+    }
 }
 
 if ($schemas.Count -ne 6) { throw 'Generator schema inventory is incomplete.' }
-if (-not (Test-Path -LiteralPath $template -PathType Leaf)) { throw "Generator template is missing: $template" }
 $expectedTypes = 'GeneratedBidAcceptedPayload', 'GeneratedAuctionPurchasedPayload', 'GeneratedAuctionClosedPayload', 'GeneratedWinnerSelectedPayload', 'GeneratedAuctionCancelledPayload'
-$templateContent = Get-Content -Raw $template
 foreach ($type in $expectedTypes) {
     if ($templateContent -notmatch $type) { throw "Generated template is missing $type." }
 }
