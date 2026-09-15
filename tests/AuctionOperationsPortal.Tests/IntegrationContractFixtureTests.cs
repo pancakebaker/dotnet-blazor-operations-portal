@@ -1,5 +1,7 @@
+using System.Globalization;
 using System.Text.Json;
 using AuctionOperationsPortal.Contracts;
+using AuctionOperationsPortal.Persistence;
 
 namespace AuctionOperationsPortal.Tests;
 
@@ -27,6 +29,14 @@ public sealed class IntegrationContractFixtureTests
         Assert.Equal(envelope.TenantId, envelope.Payload.GetProperty("tenantId").GetGuid());
         Assert.Equal(envelope.EventType, ExpectedEventType(fileName));
 
+        var activity = IntegrationEventMapper.ToActivity(
+            envelope,
+            DateTimeOffset.Parse("2026-01-01T00:10:00Z", CultureInfo.InvariantCulture));
+        Assert.Equal(envelope.EventId, activity.EventId);
+        Assert.Equal(envelope.TenantId, activity.TenantId);
+        Assert.Equal(envelope.AggregateVersion, activity.AggregateVersion);
+        Assert.Equal(envelope.AggregateId, activity.AggregateId);
+
         var payload = JsonSerializer.Deserialize(envelope.Payload.GetRawText(), payloadType, JsonOptions);
         Assert.NotNull(payload);
 
@@ -42,7 +52,7 @@ public sealed class IntegrationContractFixtureTests
             Path.Combine(
                 AppContext.BaseDirectory,
                 "..", "..", "..", "..", "..",
-                "contracts", "integration-contracts", "fixtures", "v1", fileName));
+                "tests", "contracts", "fixtures", "v1", fileName));
 
     private static string ExpectedEventType(string fileName) => fileName switch
     {
