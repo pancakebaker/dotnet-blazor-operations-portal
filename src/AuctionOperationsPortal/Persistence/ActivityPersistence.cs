@@ -3,6 +3,7 @@
 // </copyright>
 using System.Text.Json;
 using AuctionOperationsPortal.Contracts;
+using AuctionOperationsPortal.Contracts.Generated;
 using AuctionOperationsPortal.Data;
 using AuctionOperationsPortal.Telemetry;
 using DistributedBidding.IntegrationContracts;
@@ -100,20 +101,20 @@ public sealed class IntegrationEventMapper
         switch (envelope.EventType)
         {
             case IntegrationEventTypes.BidAccepted:
-                var bid = Deserialize<BidAcceptedPayload>(envelope.Payload);
+                var bid = Deserialize<GeneratedBidAcceptedPayload>(envelope.Payload);
                 ValidateAuction(bid.AuctionId, bid.AuctionVersion, envelope);
                 activity.BidId = bid.BidId;
                 activity.BidderId = bid.BidderId;
                 activity.Amount = bid.Amount;
                 break;
             case IntegrationEventTypes.AuctionClosed:
-                var closed = Deserialize<AuctionClosedPayload>(envelope.Payload);
+                var closed = Deserialize<GeneratedAuctionClosedPayload>(envelope.Payload);
                 ValidateAuction(closed.AuctionId, closed.AuctionVersion, envelope);
                 activity.BidderId = closed.FinalBidderId;
                 activity.Amount = closed.FinalBidAmount;
                 break;
             case IntegrationEventTypes.WinnerSelected:
-                var winner = Deserialize<WinnerSelectedPayload>(envelope.Payload);
+                var winner = Deserialize<GeneratedWinnerSelectedPayload>(envelope.Payload);
                 ValidateAuction(winner.AuctionId, winner.AuctionVersion, envelope);
                 activity.BidId = winner.WinningBidId;
                 activity.BidderId = winner.WinnerId;
@@ -121,14 +122,14 @@ public sealed class IntegrationEventMapper
                 activity.Amount = winner.Amount;
                 break;
             case IntegrationEventTypes.AuctionPurchased:
-                var purchase = Deserialize<AuctionPurchasedPayload>(envelope.Payload);
+                var purchase = Deserialize<GeneratedAuctionPurchasedPayload>(envelope.Payload);
                 ValidateAuction(purchase.AuctionId, purchase.AuctionVersion, envelope);
                 activity.BidderId = purchase.BidderId;
                 activity.WinnerId = purchase.BidderId;
                 activity.Amount = purchase.FinalPrice;
                 break;
             case IntegrationEventTypes.AuctionCancelled:
-                var cancelled = Deserialize<AuctionCancelledPayload>(envelope.Payload);
+                var cancelled = Deserialize<GeneratedAuctionCancelledPayload>(envelope.Payload);
                 ValidateAuction(cancelled.AuctionId, envelope);
                 break;
             default:

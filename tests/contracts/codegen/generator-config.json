@@ -4,5 +4,5 @@
   "serializer": "System.Text.Json",
   "schemaDraft": "2020-12",
   "resolution": "local-pinned-snapshot",
-  "output": "tests/AuctionOperationsPortal.Tests/ContractCodegen/Generated/IntegrationEventContracts.g.cs"
+  "output": "src/AuctionOperationsPortal/Contracts/Generated/IntegrationEventContracts.g.cs"
 }

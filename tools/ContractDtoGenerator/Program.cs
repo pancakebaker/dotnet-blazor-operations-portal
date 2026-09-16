@@ -11,7 +11,7 @@ var envelopeDefinitions = envelopeNode["$defs"]!.DeepClone();
 var eventFiles = new[] { "bid-accepted.schema.json", "auction-purchased.schema.json", "auction-closed.schema.json", "winner-selected.schema.json", "auction-cancelled.schema.json" };
 var settings = new CSharpGeneratorSettings
 {
-    Namespace = "Dbap.Operations.ContractCodegen.Generated",
+    Namespace = "AuctionOperationsPortal.Contracts.Generated",
     ClassStyle = CSharpClassStyle.Record,
     JsonLibrary = CSharpJsonLibrary.SystemTextJson,
     GenerateNullableReferenceTypes = true,

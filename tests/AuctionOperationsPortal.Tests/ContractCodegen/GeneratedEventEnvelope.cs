@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Dbap.Operations.ContractCodegen.Generated;
+namespace AuctionOperationsPortal.Tests.ContractCodegen;
 
 // Handwritten evaluation helper; payload DTOs are emitted by NJsonSchema.
 public sealed record GeneratedEventEnvelope<TPayload>(

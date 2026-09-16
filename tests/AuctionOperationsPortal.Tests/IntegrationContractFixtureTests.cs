@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 using AuctionOperationsPortal.Contracts;
+using AuctionOperationsPortal.Contracts.Generated;
 using AuctionOperationsPortal.Persistence;
 
 namespace AuctionOperationsPortal.Tests;
@@ -11,9 +12,9 @@ public sealed class IntegrationContractFixtureTests
 
     public static IEnumerable<object[]> Fixtures() =>
         [
-            ["auction-bid-accepted.json", typeof(BidAcceptedPayload)],
-            ["auction-closed.json", typeof(AuctionClosedPayload)],
-            ["winner-selected.json", typeof(WinnerSelectedPayload)]
+            ["auction-bid-accepted.json", typeof(GeneratedBidAcceptedPayload)],
+            ["auction-closed.json", typeof(GeneratedAuctionClosedPayload)],
+            ["winner-selected.json", typeof(GeneratedWinnerSelectedPayload)]
         ];
 
     [Theory]

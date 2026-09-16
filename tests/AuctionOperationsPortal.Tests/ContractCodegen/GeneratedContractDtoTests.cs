@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using AuctionOperationsPortal.Contracts;
-using Dbap.Operations.ContractCodegen.Generated;
+using AuctionOperationsPortal.Contracts.Generated;
 using Json.Schema;
 
 namespace AuctionOperationsPortal.Tests.ContractCodegen;
@@ -50,12 +50,13 @@ public sealed class GeneratedContractDtoTests
         var json = File.ReadAllText(FixturePath("auction-bid-accepted.json"));
         using var document = JsonDocument.Parse(json);
         var node = JsonNode.Parse(document.RootElement.GetRawText())!.AsObject();
-        node["futureOptionalField"] = "preserved-by-wire-policy";
+        node["payload"]!.AsObject()["futureOptionalField"] = "preserved-by-wire-policy";
 
         var generated = JsonSerializer.Deserialize<GeneratedEventEnvelope<GeneratedBidAcceptedPayload>>(node.ToJsonString(), JsonOptions);
 
         Assert.NotNull(generated);
-        Assert.Equal("preserved-by-wire-policy", node["futureOptionalField"]!.GetValue<string>());
+        Assert.Equal("preserved-by-wire-policy", node["payload"]!["futureOptionalField"]!.GetValue<string>());
+        Assert.Equal("preserved-by-wire-policy", generated.Payload.AdditionalProperties["futureOptionalField"]?.ToString());
     }
 
     [Fact]

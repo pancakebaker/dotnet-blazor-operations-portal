@@ -8,7 +8,7 @@
 #nullable enable
 
 
-namespace Dbap.Operations.ContractCodegen.Generated
+namespace AuctionOperationsPortal.Contracts.Generated
 {
     #pragma warning disable SA1600, SA1633
 
@@ -54,7 +54,7 @@ namespace Dbap.Operations.ContractCodegen.Generated
 #nullable enable
 
 
-namespace Dbap.Operations.ContractCodegen.Generated
+namespace AuctionOperationsPortal.Contracts.Generated
 {
     #pragma warning disable SA1600, SA1633
 
@@ -127,7 +127,7 @@ namespace Dbap.Operations.ContractCodegen.Generated
 #nullable enable
 
 
-namespace Dbap.Operations.ContractCodegen.Generated
+namespace AuctionOperationsPortal.Contracts.Generated
 {
     #pragma warning disable SA1600, SA1633
 
@@ -201,7 +201,7 @@ namespace Dbap.Operations.ContractCodegen.Generated
 #nullable enable
 
 
-namespace Dbap.Operations.ContractCodegen.Generated
+namespace AuctionOperationsPortal.Contracts.Generated
 {
     #pragma warning disable SA1600, SA1633
 
@@ -282,7 +282,7 @@ namespace Dbap.Operations.ContractCodegen.Generated
 #nullable enable
 
 
-namespace Dbap.Operations.ContractCodegen.Generated
+namespace AuctionOperationsPortal.Contracts.Generated
 {
     #pragma warning disable SA1600, SA1633
 

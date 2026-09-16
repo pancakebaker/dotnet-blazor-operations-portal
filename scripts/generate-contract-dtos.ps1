@@ -12,7 +12,7 @@ if ($config.generator -ne 'NJsonSchema.CodeGeneration.CSharp' -or $config.versio
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $schemaRoot = Join-Path $root 'tests/contracts/schemas/v1'
-$output = Join-Path $root 'tests/AuctionOperationsPortal.Tests/ContractCodegen/Generated/IntegrationEventContracts.g.cs'
+$output = Join-Path $root 'src/AuctionOperationsPortal/Contracts/Generated/IntegrationEventContracts.g.cs'
 $generatorProject = Join-Path $root 'tools/ContractDtoGenerator/ContractDtoGenerator.csproj'
 $schemas = Get-ChildItem -LiteralPath $schemaRoot -Filter '*.schema.json' -File | Sort-Object Name
 foreach ($schema in $schemas) {
