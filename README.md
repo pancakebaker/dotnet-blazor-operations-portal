@@ -40,38 +40,146 @@ preserves the existing success, `403`, `404`, `409`, and `503` behavior.
 
 ## Local setup
 
-Prerequisites: .NET 10 SDK, PostgreSQL, and RabbitMQ. Copy the development configuration as needed,
-provide safe local credentials, and create the `auction_operations` database before applying
-migrations.
+### Prerequisites
+
+Install the .NET 10 SDK and run the local PostgreSQL and RabbitMQ instances used by the
+platform. The repository's development configuration expects PostgreSQL at `127.0.0.1:55432`
+and RabbitMQ at `localhost:5672`, with the local credentials shown in
+`src/AuctionOperationsPortal/appsettings.json`. The [DBAP Platform Infrastructure](https://github.com/pancakebaker/docker-dbap-platform)
+repository is the intended way to start those shared services.
+
+The portal owns a separate PostgreSQL database named `auction_operations`. RabbitMQ is required
+for the activity consumer and health check; the portal can start its HTTP host before the broker
+is reachable, but activity consumption and `/health` will remain unhealthy until it is available.
+The Bidding Service is needed for tenant-management operations, not for the portal process to
+construct its local UI. Live Feed is needed only for the administrator Live Feed handoff.
+
+### Create local configuration
+
+The portal uses the standard ASP.NET Core configuration providers; it does not load a `.env`
+file. For a normal local run, use the checked-in `appsettings.Development.json` defaults and
+start with the Development environment:
+
+PowerShell:
+
+```powershell
+$env:ASPNETCORE_ENVIRONMENT = "Development"
+```
+
+The equivalent Bash setup is:
+
+```bash
+export ASPNETCORE_ENVIRONMENT=Development
+```
+
+For machine-specific values, use environment variables (double underscores map to nested
+configuration) or an untracked `src/AuctionOperationsPortal/appsettings.Development.local.json`.
+Do not put real credentials or private keys in tracked files.
+
+### Local SystemAdministrator key
+
+Development startup allows the configured SystemAdminAuth defaults, but the portal must have its
+RSA private key before it can issue a downstream token for a Bidding tenant-management request or
+a Live Feed administrator handoff. The default portal path is:
+
+```text
+src/AuctionOperationsPortal/keys/system-admin-private.pem
+```
+
+The portal owns this private key. Bidding owns only the matching public verification key at:
+
+```text
+src/bidding-service/keys/system-admin-public.pem
+```
+
+Do not copy the private key to Bidding or commit either PEM file. The following local-only
+OpenSSL commands generate a compatible RSA pair from the portal repository root; use a separate
+PowerShell or Bash equivalent if OpenSSL is not already installed:
+
+PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Force src/AuctionOperationsPortal/keys | Out-Null
+New-Item -ItemType Directory -Force ..\dotnet-bidding-service\src\bidding-service\keys | Out-Null
+openssl genrsa -out src/AuctionOperationsPortal/keys/system-admin-private.pem 2048
+openssl rsa -in src/AuctionOperationsPortal/keys/system-admin-private.pem -pubout -out ..\dotnet-bidding-service\src\bidding-service\keys\system-admin-public.pem
+```
+
+The paths can be overridden with `SystemAdminAuth__PrivateKeyPath` and
+`Authentication__SystemAdmin__PublicKeyPath` in their respective services. The default
+SystemAdminAuth values must remain aligned with Bidding: issuer `dbap-system-admin`, key ID
+`system-admin-development-1`, audience `bidding-service-admin`, and a lifetime from 60 through
+600 seconds (the Development default is 300 seconds). Production must provide its own properly
+provisioned key material and must not use development credentials or keys.
+
+### Database, restore, build, and test
+
+From the portal repository root, restore and apply the existing EF Core migrations. The target
+PostgreSQL database must be reachable; EF Core will create the database if the configured
+PostgreSQL user has permission to do so. These migrations create the portal activity projection
+and system-admin account tables. There is no migration data seed. In Development, application
+startup seeds the configured local account when `SystemAdminDemo:Enabled` is true (the default
+email is `systemadmin@example.test` and the default password is `system-admin-password`).
 
 ```text
 dotnet restore
-dotnet build --no-restore
-dotnet test
+dotnet build --no-restore --warnaserror
+dotnet ef database update --project src/AuctionOperationsPortal --startup-project src/AuctionOperationsPortal
+dotnet test --no-build --no-restore
+```
+
+### Run the portal
+
+After PostgreSQL is migrated and RabbitMQ is available:
+
+```text
 dotnet run --project src/AuctionOperationsPortal --urls http://localhost:5099
 ```
 
-Apply migrations with:
+Open the portal at `http://localhost:5099`. The local administrator login is at `/login`.
+The configured development account is seeded only in Development; production does not seed this
+demo account.
+
+The health endpoint is:
 
 ```text
-dotnet ef database update --project src/AuctionOperationsPortal --startup-project src/AuctionOperationsPortal
+http://localhost:5099/health
 ```
 
-The optional Live Feed administrator handoff uses the configured Live Feed URL and public-key
-trust settings. It does not copy or require Live Feed source files.
+It reports separate PostgreSQL and RabbitMQ checks. A healthy portal therefore requires both
+dependencies to be reachable, even though the HTTP host itself does not call Bidding or Live Feed
+during startup. The portal has no Swagger/OpenAPI endpoint.
+
+The optional Live Feed administrator handoff uses the configured Live Feed URL and opaque-code
+exchange. It does not copy or require Live Feed source files.
 
 ## Configuration
 
 Relevant settings are in `src/AuctionOperationsPortal/appsettings.json` and
 `appsettings.Development.json`. Environment variables use the normal ASP.NET configuration
-mapping, including:
+mapping. The most important local settings are:
 
-- `ConnectionStrings__AuctionOperationsDb` for the portal-owned PostgreSQL database;
-- `BiddingService__BaseUrl` and `BiddingService__TenantEndpoint` for Bidding REST access;
-- `RabbitMq__HostName`, `RabbitMq__Port`, `RabbitMq__UserName`, `RabbitMq__Password`, exchange,
-  queue, dead-letter, and prefetch settings;
-- `LiveFeedAdmin__BaseUrl` and its token/key settings for Live Feed administration;
-- `SystemAdminAuth__PrivateKeyPath` and session/data-protection settings for local admin auth.
+| Setting | Purpose | Required locally? |
+| --- | --- | --- |
+| `ConnectionStrings__AuctionOperationsDb` | Portal-owned PostgreSQL activity and admin-account database | Yes, for migration, demo seeding, login, and activity views |
+| `RabbitMq__HostName`, `RabbitMq__Port`, `RabbitMq__UserName`, `RabbitMq__Password`, `RabbitMq__VirtualHost` | Activity consumer broker connection | Yes for activity consumption and a healthy `/health` result |
+| `RabbitMq__Exchange`, `RabbitMq__Queue`, `RabbitMq__DeadLetterExchange`, `RabbitMq__DeadLetterQueue`, `RabbitMq__PrefetchCount`, `RabbitMq__MaxRequeueAttempts` | Existing activity topology and retry policy | Defaults are suitable for local infrastructure |
+| `BiddingService__BaseUrl`, `BiddingService__TenantEndpoint` | Server-side tenant-administration REST client | Only for tenant-management operations; defaults target `http://localhost:5000` and `/api/system/tenants` |
+| `SystemAdminAuth__Issuer`, `SystemAdminAuth__KeyId`, `SystemAdminAuth__PrivateKeyPath`, `SystemAdminAuth__AllowedAudiences`, `SystemAdminAuth__TokenLifetimeSeconds` | Portal RS256 SystemAdministrator token issuer | Defaults are allowed only in Development/Testing; the private key is needed when issuing a downstream token |
+| `SystemAdminDemo__Enabled`, `SystemAdminDemo__Email`, `SYSTEM_ADMIN_DEMO_PASSWORD` | Development-only local admin seeding | Optional; Development enables the demo account by default |
+| `SystemAdminSession__CookieName`, `SystemAdminSession__LifetimeMinutes` | Local admin cookie session | Defaults are suitable for Development |
+| `DATA_PROTECTION_KEYS_PATH` | Persistent ASP.NET Data Protection keys | Optional locally; useful when sessions must survive restarts |
+| `LiveFeedAdmin__BaseUrl`, `LiveFeedAdmin__SystemTokenEndpoint`, `LiveFeedAdmin__BrowserHandoffEndpoint` | Server-side Live Feed admin handoff | Only when using the Live Feed administrator feature |
+| `ASPNETCORE_ENVIRONMENT` | Selects Development defaults and local demo seeding | Set to `Development` for the documented local flow |
+
+The `SystemAdminAuth` defaults are not a security bypass. `Validate(true)` only permits the
+Development/Testing configuration values to be present without requiring a production key file;
+`SystemAdminTokenIssuer` still requires the private PEM at the configured path when it issues a
+token. Outside Development/Testing, issuer, key ID, audience, lifetime, and an existing private
+key are mandatory at startup. `AllowedAudiences` must include the requested downstream audience.
+
+The portal does not load `.env`; use ASP.NET environment variables, user secrets if configured
+by your local workflow, or the untracked `appsettings.Development.local.json` file instead.
 
 Do not commit secrets or private keys. Platform-level Docker orchestration and deployment remain
 external concerns.
