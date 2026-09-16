@@ -85,6 +85,52 @@ public sealed class AuthenticationEndpointTests : IClassFixture<AuthenticationEn
         Assert.Contains("auction_operations_auth", response.Headers.GetValues("Set-Cookie").Single());
     }
 
+    [Fact]
+    public async Task LoginPage_RendersAntiforgeryToken()
+    {
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+
+        var response = await client.GetAsync("/login");
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("__RequestVerificationToken", html, StringComparison.Ordinal);
+        Assert.Contains("antiforgery", response.Headers.GetValues("Set-Cookie").Single(), StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task LoginWithoutAntiforgeryToken_IsRejectedWithoutExecutingHandler()
+    {
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+
+        var response = await client.PostAsync(
+            "/auth/login",
+            new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("email", "systemadmin@example.test"),
+                new KeyValuePair<string, string>("password", "system-admin-password")
+            }));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task LoginWithInvalidAntiforgeryToken_IsRejectedWithoutExecutingHandler()
+    {
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+
+        var response = await client.PostAsync(
+            "/auth/login",
+            new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("email", "systemadmin@example.test"),
+                new KeyValuePair<string, string>("password", "system-admin-password"),
+                new KeyValuePair<string, string>("__RequestVerificationToken", "invalid-token")
+            }));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
     [Theory]
     [InlineData("systemadmin@example.test", "wrong-password")]
     [InlineData("unknown@example.test", "system-admin-password")]

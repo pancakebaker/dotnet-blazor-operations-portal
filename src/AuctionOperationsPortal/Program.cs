@@ -337,12 +337,12 @@ app.MapPost(
     "/auth/login",
     async (
         HttpContext context,
+        IFormCollection form,
         ISystemAdminAccountService accounts,
         IOptions<SystemAdminSessionOptions> sessionOptions,
         ILogger<Program> logger) =>
     {
         using var activity = PortalTelemetry.StartActivity("portal.auth.login");
-        var form = await context.Request.ReadFormAsync(context.RequestAborted);
         var email = form["email"].ToString();
         var password = form["password"].ToString();
         var returnUrl = form["returnUrl"].ToString();
