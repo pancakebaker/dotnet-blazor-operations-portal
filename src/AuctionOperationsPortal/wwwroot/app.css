@@ -1,161 +1,237 @@
+:root {
+  --portal-primary: #237a52;
+  --portal-primary-hover: #1b6343;
+  --portal-sidebar: #10231e;
+  --portal-sidebar-soft: #19342c;
+  --portal-sidebar-text: #dcebe5;
+  --portal-canvas: #f1f5f3;
+  --portal-panel: #ffffff;
+  --portal-border: #dbe5e0;
+  --portal-text: #183129;
+  --portal-muted: #667a72;
+  --portal-danger: #a43d48;
+  --portal-warning: #94621a;
+  --portal-success: #1d7650;
+  --portal-radius: 0.8rem;
+  --portal-shadow: 0 0.7rem 2rem rgb(16 35 30 / 7%);
+}
+
+* { box-sizing: border-box; }
+
 body {
-  font-family: system-ui, sans-serif;
+  background: var(--portal-canvas);
+  color: var(--portal-text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   margin: 0;
-  color: #1f2937;
-  background: #f8fafc;
 }
-header {
-  padding: 1.25rem 2rem;
-  background: #0f172a;
-  color: white;
+
+a { color: var(--portal-primary); }
+a:hover { color: var(--portal-primary-hover); }
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgb(35 122 82 / 28%);
+  outline-offset: 2px;
 }
-.content {
-  max-width: 70rem;
-  margin: 2rem auto;
-  padding: 0 2rem;
+
+.portal-shell { display: flex; min-height: 100vh; }
+.portal-sidebar {
+  background: var(--portal-sidebar);
+  color: var(--portal-sidebar-text);
+  flex: 0 0 16.5rem;
+  min-height: 100vh;
+  padding: 1.5rem 1rem;
 }
-body {
-  font-family: system-ui, sans-serif;
-  margin: 0;
-  color: #1f2937;
-}
-main {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 1.5rem;
-}
-header {
-  border-bottom: 1px solid #d1d5db;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-}
-header h1 {
-  margin: 0 0 0.75rem;
-}
-nav a {
-  color: #ffffff;
-  margin-right: 1rem;
-}
-nav a:visited {
-  color: #ffffff;
-}
-nav a:hover,
-nav a:focus-visible {
-  color: #d1d5db;
-}
-.content {
-  min-height: 20rem;
-}
-.tenant-toolbar {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 1rem;
-}
-.tenant-table td:last-child {
-  white-space: nowrap;
-}
-.tenant-table button {
-  font: inherit;
-  margin: 0.15rem;
-  padding: 0.4rem 0.65rem;
-}
-.status-badge {
-  border-radius: 999px;
-  display: inline-block;
-  font-weight: 700;
-  padding: 0.2rem 0.6rem;
-}
-.status-active { background: #dcfce7; color: #166534; }
-.status-suspended { background: #fef3c7; color: #92400e; }
-.status-disabled { background: #fee2e2; color: #991b1b; }
-.success-message {
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  color: #065f46;
-  margin: 1rem 0;
-  padding: 0.6rem 1rem;
-}
-.modal-backdrop {
+.portal-brand {
   align-items: center;
-  background: rgb(15 23 42 / 55%);
+  color: white;
   display: flex;
-  inset: 0;
+  gap: 0.75rem;
+  padding: 0.25rem 0.5rem 2rem;
+  text-decoration: none;
+}
+.portal-brand:hover { color: white; }
+.portal-brand strong,
+.portal-brand small { display: block; }
+.portal-brand strong { font-size: 0.93rem; letter-spacing: -0.01em; }
+.portal-brand small { color: #9ab8aa; font-size: 0.72rem; margin-top: 0.2rem; }
+.portal-brand-mark {
+  align-items: center;
+  background: var(--portal-primary);
+  border-radius: 0.65rem;
+  color: white;
+  display: inline-flex;
+  flex: 0 0 2.25rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  height: 2.25rem;
   justify-content: center;
-  position: fixed;
-  z-index: 10;
+  letter-spacing: 0.04em;
 }
-.confirmation-dialog {
+.portal-nav { display: grid; gap: 0.3rem; }
+.portal-nav a {
+  border-radius: 0.55rem;
+  color: var(--portal-sidebar-text);
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 650;
+  padding: 0.75rem 0.8rem;
+  text-decoration: none;
+}
+.portal-nav a:hover,
+.portal-nav a:focus-visible { background: var(--portal-sidebar-soft); color: white; }
+.portal-nav a.is-active { background: var(--portal-sidebar-soft); color: white; }
+.portal-main { flex: 1; min-width: 0; }
+.portal-topbar {
+  align-items: center;
+  background: var(--portal-panel);
+  border-bottom: 1px solid var(--portal-border);
+  display: flex;
+  justify-content: space-between;
+  min-height: 4.25rem;
+  padding: 0 2.5rem;
+}
+.portal-mobile-brand { color: var(--portal-muted); font-size: 0.82rem; font-weight: 700; }
+.portal-mobile-menu { display: none; position: relative; }
+.portal-mobile-menu summary {
+  background: var(--portal-primary);
+  border-radius: 0.45rem;
+  color: white;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  list-style: none;
+  padding: 0.6rem 0.85rem;
+}
+.portal-mobile-menu summary::-webkit-details-marker { display: none; }
+.portal-mobile-menu nav {
   background: white;
-  border-radius: 0.4rem;
-  max-width: 32rem;
+  border: 1px solid var(--portal-border);
+  border-radius: 0.6rem;
+  box-shadow: var(--portal-shadow);
+  display: grid;
+  gap: 0.2rem;
+  min-width: 13rem;
+  padding: 0.45rem;
+  position: absolute;
+  right: 0;
+  top: 2.8rem;
+  z-index: 5;
+}
+.portal-mobile-menu a { border-radius: 0.4rem; padding: 0.7rem; text-decoration: none; }
+.portal-mobile-menu a:hover { background: #edf6f1; }
+.portal-content { margin: 0 auto; max-width: 92rem; padding: 2.5rem; }
+.page-heading { margin-bottom: 1.75rem; }
+.page-heading h1,
+.login-card h1 { font-size: clamp(1.7rem, 2.5vw, 2.35rem); letter-spacing: -0.04em; margin: 0.25rem 0 0.45rem; }
+.page-heading p { margin: 0; max-width: 52rem; }
+.eyebrow { color: var(--portal-primary); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.muted { color: var(--portal-muted); }
+.panel,
+.auth-required-panel {
+  background: var(--portal-panel);
+  border: 1px solid var(--portal-border);
+  border-radius: var(--portal-radius);
+  box-shadow: var(--portal-shadow);
   padding: 1.5rem;
-  width: calc(100% - 2rem);
 }
-.muted {
-  color: #6b7280;
+.overview-panel { min-height: 12rem; }
+.signed-in-line { color: var(--portal-muted); margin-top: 0; }
+.signed-in-line strong { color: var(--portal-text); }
+.panel form + form { margin-top: 0.75rem; }
+.button,
+button {
+  border: 1px solid transparent;
+  border-radius: 0.45rem;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  min-height: 2.55rem;
+  padding: 0.6rem 0.9rem;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
 }
-.activity-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-.tenant-history {
-  margin: 0.5rem 0;
-  overflow-x: auto;
-}
-.tenant-history code {
-  font-size: 0.8rem;
-}
+button:disabled { cursor: not-allowed; opacity: 0.55; }
+.button-primary { background: var(--portal-primary); color: white; }
+.button-primary:hover { background: var(--portal-primary-hover); color: white; }
+.button-secondary { background: white; border-color: var(--portal-border); color: var(--portal-text); }
+.button-secondary:hover { background: #edf6f1; border-color: #bcd5c8; }
+.state-message { color: var(--portal-muted); padding: 2rem 0; text-align: center; }
+.connection-status { border-top: 1px solid var(--portal-border); margin: 1rem 0 0; padding-top: 1rem; }
+.table-scroll { overflow-x: auto; }
+.activity-table { border-collapse: collapse; min-width: 48rem; width: 100%; }
+.activity-table th { background: #f6f9f7; color: var(--portal-muted); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; }
 .activity-table th,
-.activity-table td {
-  border-bottom: 1px solid #e5e7eb;
-  padding: 0.6rem;
-  text-align: left;
-}
-.history-filters {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-  margin-bottom: 1.5rem;
-}
-.history-filters label {
-  display: grid;
-  gap: 0.35rem;
-  font-weight: 600;
-}
+.activity-table td { border-bottom: 1px solid #e8efeb; padding: 0.85rem 0.75rem; text-align: left; vertical-align: top; }
+.activity-table tbody tr:hover { background: #fbfdfc; }
+.history-filters { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); margin-bottom: 1.5rem; }
+.form-field { display: grid; gap: 0.4rem; }
+.form-field label,
+.history-filters label { color: var(--portal-text); font-size: 0.82rem; font-weight: 700; }
+.form-field input,
 .history-filters input,
 .history-filters select {
+  background: white;
+  border: 1px solid #cbdad3;
+  border-radius: 0.45rem;
+  color: var(--portal-text);
   font: inherit;
-  padding: 0.45rem;
+  min-height: 2.55rem;
+  padding: 0.55rem 0.65rem;
+  width: 100%;
 }
-.history-actions {
-  align-items: end;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-.history-actions button,
-.pagination button {
-  font: inherit;
-  padding: 0.45rem 0.8rem;
-}
-.history-actions button {
-  white-space: nowrap;
-}
+.form-field input:focus,
+.history-filters input:focus,
+.history-filters select:focus { border-color: var(--portal-primary); box-shadow: 0 0 0 3px rgb(35 122 82 / 12%); outline: none; }
+.history-actions { align-items: end; display: flex; flex-wrap: wrap; gap: 0.55rem; }
 .validation-message,
-.error-message {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #991b1b;
-  margin: 1rem 0;
-  padding: 0.6rem 1rem;
+.error-message { background: #fff4f3; border: 1px solid #f0c7c4; border-radius: 0.5rem; color: var(--portal-danger); margin: 1rem 0; padding: 0.8rem 1rem; }
+.validation-message p { margin: 0.2rem 0; }
+.success-message { background: #edf9f2; border: 1px solid #b9e2c9; border-radius: 0.5rem; color: var(--portal-success); margin: 1rem 0; padding: 0.8rem 1rem; }
+.status-badge { border-radius: 999px; display: inline-block; font-size: 0.78rem; font-weight: 800; padding: 0.3rem 0.65rem; }
+.status-active { background: #e1f5e9; color: #17613f; }
+.status-suspended { background: #fff3d9; color: var(--portal-warning); }
+.status-disabled { background: #fde5e5; color: var(--portal-danger); }
+.tenant-toolbar { display: flex; justify-content: flex-end; margin-bottom: 1rem; }
+.tenant-table td:last-child { min-width: 15rem; white-space: normal; }
+.tenant-table td:last-child button { margin: 0.15rem; }
+.tenant-history { margin: 0.5rem 0; overflow-x: auto; }
+.tenant-history code { font-size: 0.8rem; }
+.pagination { align-items: center; display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: flex-end; margin-top: 1rem; }
+.pagination span { color: var(--portal-muted); margin-right: auto; }
+.modal-backdrop { align-items: center; background: rgb(15 35 30 / 58%); display: flex; inset: 0; justify-content: center; padding: 1rem; position: fixed; z-index: 10; }
+.confirmation-dialog { background: white; border: 1px solid var(--portal-border); border-radius: var(--portal-radius); box-shadow: var(--portal-shadow); max-width: 32rem; padding: 1.5rem; width: 100%; }
+.confirmation-dialog h3 { margin-top: 0; }
+.auth-required-panel { margin: 4rem auto; max-width: 36rem; text-align: center; }
+.auth-required-panel p { color: var(--portal-muted); margin-bottom: 1.5rem; }
+.login-page { align-items: center; display: flex; justify-content: center; min-height: calc(100vh - 4.25rem); padding: 1rem 0; }
+.login-card { background: white; border: 1px solid var(--portal-border); border-radius: 1rem; box-shadow: var(--portal-shadow); max-width: 27rem; overflow: hidden; width: 100%; }
+.login-card-header { background: linear-gradient(135deg, #e6f5ed, #f8fbf9); padding: 2rem 2rem 1.5rem; }
+.login-card-header .portal-brand-mark { margin-bottom: 1.25rem; }
+.login-card-header p { color: var(--portal-muted); line-height: 1.55; margin-bottom: 0; }
+.login-form { display: grid; gap: 1rem; padding: 1.75rem 2rem 2rem; }
+.login-form p { margin: 0; }
+.login-form .button { width: 100%; }
+
+@media (max-width: 48rem) {
+  .portal-sidebar { display: none; }
+  .portal-topbar { padding: 0 1rem; }
+  .portal-mobile-menu { display: block; }
+  .portal-content { padding: 1.5rem 1rem; }
+  .panel { padding: 1rem; }
+  .activity-table { min-width: 44rem; }
 }
-.validation-message p {
-  margin: 0.2rem 0;
+
+@media (max-width: 30rem) {
+  .portal-content { padding: 1rem 0.75rem; }
+  .page-heading { margin-bottom: 1.25rem; }
+  .history-actions .button { flex: 1 1 100%; }
+  .login-card-header,
+  .login-form { padding-left: 1.25rem; padding-right: 1.25rem; }
+  .pagination { justify-content: stretch; }
+  .pagination span { flex-basis: 100%; margin-right: 0; }
 }
-.pagination {
-  align-items: center;
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 1rem;
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
 }

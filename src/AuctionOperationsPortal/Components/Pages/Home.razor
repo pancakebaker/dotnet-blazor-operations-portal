@@ -1,28 +1,34 @@
 @page "/"
 @attribute [Authorize(Policy = "AuctionOperationsAdmin")]
 <PageTitle>Auction Operations Portal</PageTitle>
-<h2>Operations</h2>
+<div class="page-heading">
+    <span class="eyebrow">Control plane</span>
+    <h1>Operations</h1>
+    <p class="muted">Monitor platform activity and manage tenant lifecycle state.</p>
+</div>
+<section class="panel overview-panel">
 <AuthorizeView>
     <Authorized Context="authState">
-        <p>
+        <p class="signed-in-line">
             Signed in as:
             <strong>
                 @(authState.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
                     ?? authState.User.Identity?.Name)
             </strong>
         </p>
-        <p>The portal foundation is ready to receive and persist auction activity events.</p>
+        <p class="muted">The portal foundation is ready to receive and persist auction activity events.</p>
         @if (authState.User.IsInRole("SystemAdministrator")
             && authState.User.HasClaim("permission", "livefeed.admin"))
         {
             <form method="post" action="/admin/live-feed/access">
                 <AntiforgeryToken />
-                <button type="submit">Open Live Feed administration</button>
+                <button class="button button-primary" type="submit">Open Live Feed administration</button>
             </form>
         }
         <form method="post" action="/auth/logout">
             <AntiforgeryToken />
-            <button type="submit">Sign out</button>
+            <button class="button button-secondary" type="submit">Sign out</button>
         </form>
     </Authorized>
 </AuthorizeView>
+</section>

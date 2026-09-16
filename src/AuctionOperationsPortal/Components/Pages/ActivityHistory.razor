@@ -7,26 +7,27 @@
 
 <PageTitle>Activity History | Auction Operations Portal</PageTitle>
 
-<h2>Activity History</h2>
-<p class="muted">
-    Search the durable operational activity projection. All filters and displayed timestamps use
-    UTC.
-</p>
+<div class="page-heading">
+    <span class="eyebrow">Audit trail</span>
+    <h1>Activity History</h1>
+    <p class="muted">Search the durable operational activity projection. All filters and displayed timestamps use UTC.</p>
+</div>
+<section class="panel history-panel">
 
 <form class="history-filters" @onsubmit="SearchAsync" @onsubmit:preventDefault>
-    <label>
+    <label class="form-field">
         From (UTC)
         <input type="datetime-local" @bind="fromInput" />
     </label>
-    <label>
+    <label class="form-field">
         To (UTC)
         <input type="datetime-local" @bind="toInput" />
     </label>
-    <label>
+    <label class="form-field">
         Auction/Aggregate ID
         <input type="text" @bind="aggregateInput" placeholder="Optional GUID" />
     </label>
-    <label>
+    <label class="form-field">
         Event Type
         <select @bind="eventTypeInput">
             <option value="">All</option>
@@ -36,7 +37,7 @@
             }
         </select>
     </label>
-    <label>
+    <label class="form-field">
         Page size
         <select @bind="pageSizeInput">
             <option value="25">25</option>
@@ -45,9 +46,9 @@
         </select>
     </label>
     <div class="history-actions">
-        <button type="submit">Search</button>
-        <button type="button" @onclick="ResetAsync">Reset</button>
-        <button type="button" @onclick="DownloadPdfAsync">Download PDF</button>
+        <button class="button button-primary" type="submit">Search</button>
+        <button class="button button-secondary" type="button" @onclick="ResetAsync">Reset</button>
+        <button class="button button-secondary" type="button" @onclick="DownloadPdfAsync">Download PDF</button>
     </div>
 </form>
 
@@ -75,7 +76,7 @@ else if (result is null || result.Items.Count == 0)
 }
 else
 {
-    <table class="activity-table">
+    <div class="table-scroll"><table class="activity-table">
         <thead>
             <tr>
                 <th>Time (UTC)</th>
@@ -103,7 +104,7 @@ else
                 </tr>
             }
         </tbody>
-    </table>
+    </table></div>
 }
 
 @if (result is not null && result.TotalPages > 0)
@@ -120,6 +121,8 @@ else
             disabled="@(result.Page >= result.TotalPages)">Next</button>
     </div>
 }
+
+</section>
 
 @code {
     [SupplyParameterFromQuery(Name = "from")]

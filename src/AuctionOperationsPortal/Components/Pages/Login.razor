@@ -2,24 +2,29 @@
 @using Microsoft.AspNetCore.Components
 @attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
 <PageTitle>System Administration Sign In</PageTitle>
-<main>
-    <h1>System Administration</h1>
-    <h2>Operations Portal</h2>
-    <p>Sign in with an authorized system administrator account.</p>
-    <form method="post" action="/auth/login">
+<section class="login-page">
+    <div class="login-card">
+        <div class="login-card-header">
+            <span class="portal-brand-mark" aria-hidden="true">AO</span>
+            <span class="eyebrow">System administration</span>
+            <h1>Operations Portal</h1>
+            <p>Sign in with an authorized system administrator account.</p>
+        </div>
+        <form class="login-form" method="post" action="/auth/login">
         <AntiforgeryToken />
         <input type="hidden" name="returnUrl" value="@SafeReturnUrl" />
-        <p>
+        <p class="form-field">
             <label for="email">Email</label>
             <input id="email" name="email" type="email" autocomplete="username" required />
         </p>
-        <p>
+        <p class="form-field">
             <label for="password">Password</label>
             <input id="password" name="password" type="password" autocomplete="current-password" required />
         </p>
-        <button type="submit">Sign in</button>
-    </form>
-</main>
+        <button class="button button-primary" type="submit">Sign in</button>
+        </form>
+    </div>
+</section>
 
 @code {
     [SupplyParameterFromQuery(Name = "returnUrl")]

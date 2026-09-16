@@ -1,15 +1,56 @@
 @inherits LayoutComponentBase
-<main>
-    <header>
-        <h1>Auction Operations Portal</h1>
-        <nav>
-            <a href="/">Operations</a>
-            <a href="/activity/live">Live Activity</a>
-            <a href="/activity/history">Activity History</a>
-            <a href="/admin/tenants">Tenants</a>
-        </nav>
-    </header>
-    <section class="content">
-        @Body
-    </section>
-</main>
+@inject NavigationManager Navigation
+<div class="portal-shell">
+    <aside class="portal-sidebar">
+        <a class="portal-brand" href="/" aria-label="Auction Operations Portal home">
+            <span class="portal-brand-mark" aria-hidden="true">AO</span>
+            <span>
+                <strong>Auction Operations</strong>
+                <small>Control plane</small>
+            </span>
+        </a>
+        <AuthorizeView>
+            <Authorized>
+                <nav class="portal-nav" aria-label="Primary navigation">
+                    <a class="@NavClass("/")" href="/" aria-current="@NavCurrent("/")">Operations</a>
+                    <a class="@NavClass("/activity/live")" href="/activity/live" aria-current="@NavCurrent("/activity/live")">Live Activity</a>
+                    <a class="@NavClass("/activity/history")" href="/activity/history" aria-current="@NavCurrent("/activity/history")">Activity History</a>
+                    <a class="@NavClass("/admin/tenants")" href="/admin/tenants" aria-current="@NavCurrent("/admin/tenants")">Tenants</a>
+                </nav>
+            </Authorized>
+        </AuthorizeView>
+    </aside>
+    <div class="portal-main">
+        <header class="portal-topbar">
+            <div class="portal-mobile-brand">Auction Operations Portal</div>
+            <AuthorizeView>
+                <Authorized>
+                    <details class="portal-mobile-menu">
+                        <summary>Menu</summary>
+                        <nav aria-label="Mobile navigation">
+                            <a class="@NavClass("/")" href="/" aria-current="@NavCurrent("/")">Operations</a>
+                            <a class="@NavClass("/activity/live")" href="/activity/live" aria-current="@NavCurrent("/activity/live")">Live Activity</a>
+                            <a class="@NavClass("/activity/history")" href="/activity/history" aria-current="@NavCurrent("/activity/history")">Activity History</a>
+                            <a class="@NavClass("/admin/tenants")" href="/admin/tenants" aria-current="@NavCurrent("/admin/tenants")">Tenants</a>
+                        </nav>
+                    </details>
+                </Authorized>
+            </AuthorizeView>
+        </header>
+        <main class="portal-content">
+            @Body
+        </main>
+    </div>
+</div>
+
+@code {
+    private string CurrentPath => new Uri(Navigation.Uri).AbsolutePath;
+
+    private string NavClass(string path) => string.Equals(CurrentPath, path, StringComparison.Ordinal)
+        ? "is-active"
+        : string.Empty;
+
+    private string? NavCurrent(string path) => string.Equals(CurrentPath, path, StringComparison.Ordinal)
+        ? "page"
+        : null;
+}

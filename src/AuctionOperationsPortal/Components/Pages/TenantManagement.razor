@@ -8,11 +8,12 @@
 
 <PageTitle>Tenants | Auction Operations Portal</PageTitle>
 
-<h2>Tenant lifecycle</h2>
-<p class="muted">
-    SystemAdministrator controls are authoritative in Bidding. Changes take effect immediately for
-    HTTP and new Live Feed admission; existing Live Feed rooms revoke as the status event is processed.
-</p>
+<div class="page-heading">
+    <span class="eyebrow">Platform governance</span>
+    <h1>Tenant lifecycle</h1>
+    <p class="muted">SystemAdministrator controls are authoritative in Bidding. Changes take effect immediately for HTTP and new Live Feed admission; existing Live Feed rooms revoke as the status event is processed.</p>
+</div>
+<section class="panel tenant-panel">
 
 @if (loading)
 {
@@ -21,7 +22,7 @@
 else if (loadError)
 {
     <p class="error-message" role="alert">Unable to load tenants. Please try again.</p>
-    <button type="button" @onclick="RefreshAsync">Retry</button>
+    <button class="button button-primary" type="button" @onclick="RefreshAsync">Retry</button>
 }
 else if (tenants.Count == 0)
 {
@@ -30,7 +31,7 @@ else if (tenants.Count == 0)
 else
 {
     <div class="tenant-toolbar">
-        <button type="button" @onclick="RefreshAsync" disabled="@loading">Refresh</button>
+        <button class="button button-secondary" type="button" @onclick="RefreshAsync" disabled="@loading">Refresh</button>
     </div>
     @if (!string.IsNullOrWhiteSpace(feedback))
     {
@@ -40,7 +41,7 @@ else
     {
         <p class="error-message" role="alert">@error</p>
     }
-    <table class="activity-table tenant-table">
+    <div class="table-scroll"><table class="activity-table tenant-table">
         <thead>
             <tr><th>Tenant</th><th>Status</th><th>Version</th><th>Last updated (UTC)</th><th>Actions</th></tr>
         </thead>
@@ -77,7 +78,7 @@ else
                             else if (historyErrors.TryGetValue(tenant.TenantId, out var historyError))
                             {
                                 <p class="error-message" role="alert">@historyError</p>
-                                <button type="button" @onclick="() => LoadHistoryAsync(tenant.TenantId, false)">Retry</button>
+                                <button class="button button-primary" type="button" @onclick="() => LoadHistoryAsync(tenant.TenantId, false)">Retry</button>
                             }
                             else if (!histories.TryGetValue(tenant.TenantId, out var history) || history.Count == 0)
                             {
@@ -103,9 +104,9 @@ else
                                     </table>
                                     @if (history.Count == HistoryPageSize)
                                     {
-                                        <button type="button" @onclick="() => LoadHistoryAsync(tenant.TenantId, true)">Load more</button>
+                                        <button class="button button-secondary" type="button" @onclick="() => LoadHistoryAsync(tenant.TenantId, true)">Load more</button>
                                     }
-                                    <button type="button" @onclick="() => LoadHistoryAsync(tenant.TenantId, false)">Refresh history</button>
+                                    <button class="button button-secondary" type="button" @onclick="() => LoadHistoryAsync(tenant.TenantId, false)">Refresh history</button>
                                 </div>
                             }
                         </td>
@@ -113,8 +114,10 @@ else
                 }
             }
         </tbody>
-    </table>
+    </table></div>
 }
+
+</section>
 
 @if (confirmation is not null)
 {

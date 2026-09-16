@@ -5,11 +5,12 @@
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
-                    <LayoutView Layout="@typeof(MainLayout)">
-                        <h2>Authentication required</h2>
+                    <section class="auth-required-panel" aria-labelledby="auth-required-title">
+                        <span class="eyebrow">Access required</span>
+                        <h2 id="auth-required-title">Authentication required</h2>
                         <p>Sign in as a system administrator to continue.</p>
-                        <a href="/login">Open Operations Portal sign-in</a>
-                    </LayoutView>
+                        <a class="button button-primary" href="/login">Open Operations Portal sign-in</a>
+                    </section>
                 </NotAuthorized>
             </AuthorizeRouteView>
         </Found>

@@ -6,23 +6,24 @@
 
 <PageTitle>Live Activity | Auction Operations Portal</PageTitle>
 
-<h2>Live Activity</h2>
-<p class="muted">
-    Persisted activity is the source of truth. The live connection fills in new events and
-    reconciles after reconnect.
-</p>
+<div class="page-heading">
+    <span class="eyebrow">Monitoring</span>
+    <h1>Live Activity</h1>
+    <p class="muted">Persisted activity is the source of truth. The live connection fills in new events and reconciles after reconnect.</p>
+</div>
+<section class="panel activity-panel">
 
 @if (loading)
 {
-    <p>Loading recent activity…</p>
+    <p class="state-message">Loading recent activity…</p>
 }
 else if (activities.Count == 0)
 {
-    <p>No activity has been recorded yet.</p>
+    <p class="state-message">No activity has been recorded yet.</p>
 }
 else
 {
-    <table class="activity-table">
+    <div class="table-scroll"><table class="activity-table">
         <thead>
             <tr>
                 <th>Time</th>
@@ -50,13 +51,15 @@ else
                 </tr>
             }
         </tbody>
-    </table>
+    </table></div>
 }
 
 @if (!string.IsNullOrWhiteSpace(connectionStatus))
 {
-    <p class="muted">@connectionStatus</p>
+    <p class="connection-status muted" role="status">@connectionStatus</p>
 }
+
+</section>
 
 @code {
     private const int RecentLimit = 100;
