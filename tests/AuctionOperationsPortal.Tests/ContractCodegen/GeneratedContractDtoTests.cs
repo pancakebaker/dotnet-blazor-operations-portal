@@ -87,6 +87,15 @@ public sealed class GeneratedContractDtoTests
     }
 
     [Fact]
+    public void GeneratedDtoUsesApprovedClrTypes()
+    {
+        Assert.Equal(typeof(decimal), typeof(GeneratedBidAcceptedPayload).GetProperty(nameof(GeneratedBidAcceptedPayload.Amount))!.PropertyType);
+        Assert.Equal(typeof(Guid), typeof(GeneratedBidAcceptedPayload).GetProperty(nameof(GeneratedBidAcceptedPayload.AuctionId))!.PropertyType);
+        Assert.Equal(typeof(DateTimeOffset), typeof(GeneratedBidAcceptedPayload).GetProperty(nameof(GeneratedBidAcceptedPayload.OccurredAtUtc))!.PropertyType);
+        Assert.Equal(typeof(decimal?), typeof(GeneratedAuctionClosedPayload).GetProperty(nameof(GeneratedAuctionClosedPayload.FinalBidAmount))!.PropertyType);
+    }
+
+    [Fact]
     public void CanonicalBidAcceptedFixturePassesDraft202012SchemaValidation()
     {
         var result = EvaluateSchema("bid-accepted.schema.json", File.ReadAllText(FixturePath("auction-bid-accepted.json")));

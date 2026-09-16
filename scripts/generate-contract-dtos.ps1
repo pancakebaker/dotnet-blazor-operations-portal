@@ -13,31 +13,20 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $schemaRoot = Join-Path $root 'tests/contracts/schemas/v1'
 $output = Join-Path $root 'tests/AuctionOperationsPortal.Tests/ContractCodegen/Generated/IntegrationEventContracts.g.cs'
-$template = Join-Path $root 'tests/contracts/codegen/IntegrationEventContracts.template.g.cs'
+$generatorProject = Join-Path $root 'tools/ContractDtoGenerator/ContractDtoGenerator.csproj'
 $schemas = Get-ChildItem -LiteralPath $schemaRoot -Filter '*.schema.json' -File | Sort-Object Name
-if (-not (Test-Path -LiteralPath $template -PathType Leaf)) { throw "Generator template is missing: $template" }
-$templateContent = Get-Content -Raw $template
 foreach ($schema in $schemas) {
     $document = Get-Content -Raw $schema.FullName | ConvertFrom-Json
     if ([string]::IsNullOrWhiteSpace($document.'$id')) { throw "Schema has no stable id: $($schema.Name)" }
-    if ($schema.Name -ne 'event-envelope.schema.json') {
-        foreach ($property in @($document.allOf[1].properties.payload.properties.psobject.Properties.Name)) {
-            if (-not $templateContent.Contains("JsonPropertyName(`"$property`")")) {
-                throw "Generated template is missing schema property $property from $($schema.Name)."
-            }
-        }
-    }
 }
 
 if ($schemas.Count -ne 6) { throw 'Generator schema inventory is incomplete.' }
-$expectedTypes = 'GeneratedBidAcceptedPayload', 'GeneratedAuctionPurchasedPayload', 'GeneratedAuctionClosedPayload', 'GeneratedWinnerSelectedPayload', 'GeneratedAuctionCancelledPayload'
-foreach ($type in $expectedTypes) {
-    if ($templateContent -notmatch $type) { throw "Generated template is missing $type." }
-}
+if (-not (Test-Path -LiteralPath $generatorProject -PathType Leaf)) { throw "Generator project is missing: $generatorProject" }
 
 if ($Verify) {
     $temporary = Join-Path ([System.IO.Path]::GetTempPath()) 'dbap-operations-generated-contracts.g.cs'
-    Copy-Item -LiteralPath $template -Destination $temporary -Force
+    & dotnet run --project $generatorProject --no-restore -- --output $temporary
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     $expectedBytes = [System.IO.File]::ReadAllBytes($temporary)
     $actualBytes = [System.IO.File]::ReadAllBytes($output)
     if (-not [System.Linq.Enumerable]::SequenceEqual($expectedBytes, $actualBytes)) {
@@ -49,5 +38,6 @@ if ($Verify) {
     exit 0
 }
 
-Copy-Item -LiteralPath $template -Destination $output -Force
+& dotnet run --project $generatorProject --no-restore -- --output $output
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 Write-Output 'Generated contract DTO snapshot from the pinned local schema input.'

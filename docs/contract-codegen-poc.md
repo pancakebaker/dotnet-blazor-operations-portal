@@ -3,17 +3,18 @@
 This test-only POC evaluates schema-native C# wire DTOs for the Operations
 consumer boundary. It uses the pinned `v1.0.0` contract snapshot from
 `pancakebaker/dbap-integration-contracts` at commit
-`6c89fb85d96110b881ff789470e3d7acfd5331e1`. The generated-style output lives
+`6c89fb85d96110b881ff789470e3d7acfd5331e1`. The generated output lives
 under `tests/AuctionOperationsPortal.Tests/ContractCodegen/Generated/` and is not referenced by production
 code, RabbitMQ handling, persistence, reports, SignalR, or UI models.
 
 ## Generator
 
-The selected candidate is NJsonSchema.CodeGeneration.CSharp `11.3.2`, evaluated
-with `System.Text.Json` settings. It is schema-native and can preserve explicit
-nullable, `Guid`, `DateTimeOffset`, and numeric mappings. The POC snapshot keeps
-the output small and reviewable; a future adoption should generate it from a
-checked-in tool configuration rather than hand-editing it.
+The selected generator is NJsonSchema.CodeGeneration.CSharp `11.3.2`, invoked
+by `tools/ContractDtoGenerator` with explicit `System.Text.Json`, decimal,
+`Guid`, `DateTimeOffset`, nullable, native-record, and namespace settings. The
+payload DTO source is emitted directly from the local schemas. A small
+handwritten envelope helper remains in the test project because the canonical
+envelope is generic at this evaluation boundary.
 
 The canonical event schemas use draft-2020-12 URN references. Generation must
 therefore use a deterministic local resolver/bundle step. The POC deliberately
@@ -30,9 +31,9 @@ introduce a sibling checkout or runtime dependency.
 - An adapter to the existing `IntegrationEventEnvelope` proves the generated
   payload can enter the current Operations mapping boundary without changing
   production code.
-- `additionalProperties: true` remains a policy concern: System.Text.Json
-  ignores unknown fields by default, which is compatible for additive fields but
-  does not capture them.
+- `additionalProperties: true` remains a policy concern: the emitted DTOs use
+  System.Text.Json extension-data properties, so compatible additive fields are
+  accepted and retained without becoming typed members.
 - Unknown enum values are not represented by these payload DTOs; future enum
   generation must use string-compatible handling or explicit tolerant wrappers.
 - Missing required fields and malformed values require schema validation before
@@ -41,8 +42,8 @@ introduce a sibling checkout or runtime dependency.
 - `aggregateVersion` and `eventId` remain separate fields; the generated shape
   does not collapse same-version companion events.
 
-The snapshot is 1 generated source file containing 6 DTO families and 53
-properties. The existing manual Operations contract file also contains the
+The snapshot is 1 generated source file containing 5 payload DTO families and
+35 properties. The handwritten evaluation envelope adds one generic type. The existing manual Operations contract file also contains the
 production envelope and payload records, but the meaningful mapper and
 projection behavior remains outside that mechanical surface. The POC therefore
 reduces declaration duplication but does not remove the activity mapper or
@@ -70,7 +71,7 @@ Run `pwsh ./scripts/generate-contract-dtos.ps1` to regenerate the test-only
 output, or add `-Verify` to perform a byte-for-byte drift check without changing
 the worktree. The script resolves the repository root, checks the exact schema
 inventory and hashes, disables network schema retrieval in the test validator,
-and uses the stable local template/output pair. No sibling checkout or network
+and invokes the pinned local NJsonSchema harness. No sibling checkout or network
 access is required after dependencies are restored.
 
 The conformance boundary is explicit: fixture JSON is validated against the

@@ -45,6 +45,8 @@ jobs:
         with:
           dotnet-version: 10.x
       - run: dotnet restore
+      - name: Restore DTO generator
+        run: dotnet restore tools/ContractDtoGenerator/ContractDtoGenerator.csproj
       - run: dotnet build --no-restore --warnaserror
       - name: Verify contract schema snapshot
         shell: pwsh
