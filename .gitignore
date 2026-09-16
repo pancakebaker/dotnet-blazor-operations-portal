@@ -11,6 +11,7 @@ TestResults/
 
 ## Local configuration and generated reports
 .env
+.local/
 appsettings.*.local.json
 *.pfx
 *.key

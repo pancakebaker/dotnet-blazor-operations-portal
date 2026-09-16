@@ -58,23 +58,31 @@ construct its local UI. Live Feed is needed only for the administrator Live Feed
 
 The portal uses the standard ASP.NET Core configuration providers; it does not load a `.env`
 file. For a normal local run, use the checked-in `appsettings.Development.json` defaults and
-start with the Development environment:
+select the Development environment before running any command that starts the portal:
 
 PowerShell:
 
 ```powershell
 $env:ASPNETCORE_ENVIRONMENT = "Development"
+$env:DATA_PROTECTION_KEYS_PATH = $null
 ```
 
 The equivalent Bash setup is:
 
 ```bash
 export ASPNETCORE_ENVIRONMENT=Development
+unset DATA_PROTECTION_KEYS_PATH
 ```
 
 For machine-specific values, use environment variables (double underscores map to nested
 configuration) or an untracked `src/AuctionOperationsPortal/appsettings.Development.local.json`.
 Do not put real credentials or private keys in tracked files.
+
+The explicit Development setting is part of the fresh-clone setup. The startup validators allow
+the checked-in SystemAdminAuth and SystemAdminSession defaults only in Development or Testing;
+without it, the portal applies production validation and requires a real signing key and an
+existing Data Protection directory. Do not carry a stale `ASPNETCORE_ENVIRONMENT=Production` or
+`DATA_PROTECTION_KEYS_PATH` value into this local run.
 
 ### Local SystemAdministrator key
 
@@ -111,6 +119,32 @@ SystemAdminAuth values must remain aligned with Bidding: issuer `dbap-system-adm
 `system-admin-development-1`, audience `bidding-service-admin`, and a lifetime from 60 through
 600 seconds (the Development default is 300 seconds). Production must provide its own properly
 provisioned key material and must not use development credentials or keys.
+
+The private signing key is not required merely to boot the Development portal or to log in to its
+local cookie session. It is required when an authenticated portal action issues a downstream
+SystemAdministrator token. The local login account is seeded separately from the key material.
+
+### Data Protection and session keys
+
+No Data Protection directory needs to exist in the documented Development setup. With
+`DATA_PROTECTION_KEYS_PATH` unset, ASP.NET Core uses its normal local key storage and the portal
+does not call `PersistKeysToFileSystem`; the strict `SystemAdminSession` directory check is only
+applied outside Development/Testing. This is sufficient for a single local process and its
+short-lived cookie session.
+
+For a persistent or multi-instance deployment, set `DATA_PROTECTION_KEYS_PATH` to an existing,
+shared directory before startup. For example, in PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Path .local\data-protection -Force | Out-Null
+$env:DATA_PROTECTION_KEYS_PATH = (Resolve-Path .local\data-protection).Path
+```
+
+The directory is shared by portal instances that must decrypt the same cookie/session data. It is
+not shared with Bidding, Live Feed, or any other service, and it must not contain private signing
+keys. The `.local` directory is ignored by Git. Production also requires an existing directory,
+the configured `SystemAdminSession__CookieName`, and a `SystemAdminSession__LifetimeMinutes`
+between 15 and 30.
 
 ### Database, restore, build, and test
 
@@ -168,15 +202,17 @@ mapping. The most important local settings are:
 | `SystemAdminAuth__Issuer`, `SystemAdminAuth__KeyId`, `SystemAdminAuth__PrivateKeyPath`, `SystemAdminAuth__AllowedAudiences`, `SystemAdminAuth__TokenLifetimeSeconds` | Portal RS256 SystemAdministrator token issuer | Defaults are allowed only in Development/Testing; the private key is needed when issuing a downstream token |
 | `SystemAdminDemo__Enabled`, `SystemAdminDemo__Email`, `SYSTEM_ADMIN_DEMO_PASSWORD` | Development-only local admin seeding | Optional; Development enables the demo account by default |
 | `SystemAdminSession__CookieName`, `SystemAdminSession__LifetimeMinutes` | Local admin cookie session | Defaults are suitable for Development |
-| `DATA_PROTECTION_KEYS_PATH` | Persistent ASP.NET Data Protection keys | Optional locally; useful when sessions must survive restarts |
+| `DATA_PROTECTION_KEYS_PATH` | Existing shared ASP.NET Data Protection key directory | Leave unset for single-process Development; required with an existing directory outside Development/Testing |
 | `LiveFeedAdmin__BaseUrl`, `LiveFeedAdmin__SystemTokenEndpoint`, `LiveFeedAdmin__BrowserHandoffEndpoint` | Server-side Live Feed admin handoff | Only when using the Live Feed administrator feature |
 | `ASPNETCORE_ENVIRONMENT` | Selects Development defaults and local demo seeding | Set to `Development` for the documented local flow |
 
-The `SystemAdminAuth` defaults are not a security bypass. `Validate(true)` only permits the
-Development/Testing configuration values to be present without requiring a production key file;
-`SystemAdminTokenIssuer` still requires the private PEM at the configured path when it issues a
-token. Outside Development/Testing, issuer, key ID, audience, lifetime, and an existing private
-key are mandatory at startup. `AllowedAudiences` must include the requested downstream audience.
+The `SystemAdminAuth` and `SystemAdminSession` defaults are not security bypasses. Their
+`Validate(true)` paths only permit Development/Testing defaults to be present without requiring
+production filesystem material. `SystemAdminTokenIssuer` still requires the private PEM at the
+configured path when it issues a token. Outside Development/Testing, SystemAdminAuth requires a
+valid issuer, key ID, audience, 60-600 second lifetime, and existing private key; SystemAdminSession
+requires a cookie name, 15-30 minute lifetime, and existing Data Protection directory.
+`AllowedAudiences` must include the requested downstream audience.
 
 The portal does not load `.env`; use ASP.NET environment variables, user secrets if configured
 by your local workflow, or the untracked `appsettings.Development.local.json` file instead.
