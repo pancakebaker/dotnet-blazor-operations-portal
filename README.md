@@ -4,6 +4,104 @@
 
 Standalone ASP.NET Core Blazor Operations Portal for the Distributed Bidding Auction Platform.
 
+## Quick local setup
+
+This quick start gets the Operations Portal running locally with the repository's
+Development configuration.
+
+### 1. Start the shared infrastructure
+
+The portal requires PostgreSQL and RabbitMQ for its database, activity consumer,
+and healthy `/health` result.
+
+Start those services from the
+[DBAP Platform Infrastructure](https://github.com/pancakebaker/docker-dbap-platform)
+repository and follow its Quick Start instructions.
+
+The portal uses its own `auction_operations` PostgreSQL database; application
+tables are created by this repository's EF Core migrations.
+
+### 2. Select the Development environment
+
+This application does **not** load a `.env` file. From the portal repository
+root, set the Development environment before running commands that start the
+application:
+
+```powershell
+$env:ASPNETCORE_ENVIRONMENT = "Development"
+$env:DATA_PROTECTION_KEYS_PATH = $null
+```
+
+The second command clears any stale machine-level Data Protection override.
+For the normal single-process Development setup, no custom Data Protection
+directory is required.
+
+### 3. Restore, build, and migrate
+
+```powershell
+dotnet restore
+dotnet build --no-restore --warnaserror
+
+dotnet ef database update `
+  --project src/AuctionOperationsPortal `
+  --startup-project src/AuctionOperationsPortal
+```
+
+Development startup creates the configured local SystemAdministrator account
+when demo seeding is enabled.
+
+### 4. Start the portal
+
+```powershell
+dotnet run `
+  --project src/AuctionOperationsPortal `
+  --urls http://localhost:5099
+```
+
+Open:
+
+```text
+http://localhost:5099
+```
+
+Health check:
+
+```text
+http://localhost:5099/health
+```
+
+Default Development administrator:
+
+```text
+Email:    systemadmin@example.test
+Password: system-admin-password
+```
+
+These credentials are for local/demo use only.
+
+### 5. Optional: enable Bidding tenant administration
+
+The portal can boot and use its local login without a SystemAdministrator RSA
+private key. Actions that call the Bidding Service require the dedicated
+Portal -> Bidding signing key.
+
+Start the
+[.NET Bidding Service](https://github.com/pancakebaker/dotnet-bidding-service)
+using its Quick Local Setup guide, then follow
+[Local SystemAdministrator key](#local-systemadministrator-key) below to
+provision the portal private key and the matching Bidding public key.
+
+### 6. Optional: enable Live Feed administrator handoff
+
+The Live Feed service is required only for the administrator Live Feed handoff.
+Start the
+[Node.js Live Feed](https://github.com/pancakebaker/nodejs-live-feed)
+using its Quick Local Setup guide after the Portal -> Bidding setup is working.
+
+For persistent/multi-instance Data Protection, machine-specific configuration,
+token settings, and service details, continue with
+[Detailed local setup](#detailed-local-setup).
+
 ## Responsibility
 
 This repository owns the SystemAdministrator control-plane UI, tenant lifecycle visibility and
@@ -38,7 +136,7 @@ operations. Tenant-user authentication and impersonation are outside this reposi
 Tenant management uses Bidding REST endpoints with configured expected-version concurrency and
 preserves the existing success, `403`, `404`, `409`, and `503` behavior.
 
-## Local setup
+## Detailed local setup
 
 ### Prerequisites
 
@@ -54,7 +152,7 @@ is reachable, but activity consumption and `/health` will remain unhealthy until
 The Bidding Service is needed for tenant-management operations, not for the portal process to
 construct its local UI. Live Feed is needed only for the administrator Live Feed handoff.
 
-### Create local configuration
+### Development configuration
 
 The portal uses the standard ASP.NET Core configuration providers; it does not load a `.env`
 file. For a normal local run, use the checked-in `appsettings.Development.json` defaults and
@@ -148,7 +246,8 @@ between 15 and 30.
 
 ### Database, restore, build, and test
 
-From the portal repository root, restore and apply the existing EF Core migrations. The target
+From the portal repository root, restore and apply the existing EF Core migrations. The full test
+command is useful for validation but is not required merely to start the local portal. The target
 PostgreSQL database must be reachable; EF Core will create the database if the configured
 PostgreSQL user has permission to do so. These migrations create the portal activity projection
 and system-admin account tables. There is no migration data seed. In Development, application
